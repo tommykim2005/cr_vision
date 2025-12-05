@@ -12,8 +12,6 @@ class VSDetector:
         
     
     def detect(self, frame):
-
-        
         gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # match template

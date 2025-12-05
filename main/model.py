@@ -6,6 +6,8 @@ import time
 
 from main.game_detector import VSDetector
 from main.window_detector import find_window
+from game.game_loop import start_model
+
 
 # Load model
 model = YOLO("models/best.pt")
@@ -38,11 +40,7 @@ def init_program():
 def start_model(sct, monitor):
 
     print("Starting YOLO model stream...")
-
-    # Warm-up YOLO for speed
-    dummy = np.zeros((640, 640, 3), dtype=np.uint8)
-    model(dummy)
-
+    # Warm-up YOLO for speed=
     while True:
         img = np.array(sct.grab(monitor))
         frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
