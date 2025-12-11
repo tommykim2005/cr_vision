@@ -4,7 +4,7 @@ import cv2
 from ultralytics import YOLO
 import time
 
-from main.game_detector import VSDetector
+from main.vs_detector import VSDetector
 from main.window_detector import find_window
 from game.game_loop import start_model
 
@@ -20,7 +20,9 @@ def init_program():
     vs_triggered = False
 
     sct = mss.mss()
+
     monitor = find_window("BlueStacks")
+    print(monitor)
 
     print("Waiting for VS screen...")
 
@@ -37,20 +39,3 @@ def init_program():
             break
 
 
-def start_model(sct, monitor):
-
-    print("Starting YOLO model stream...")
-    # Warm-up YOLO for speed=
-    while True:
-        img = np.array(sct.grab(monitor))
-        frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-
-        results = model(frame, imgsz=640)
-        annotated = results[0].plot()
-
-        cv2.imshow("BlueStacks Frame", annotated)
-
-        if cv2.waitKey(1) == ord('q'):
-            break
-
-    cv2.destroyAllWindows()

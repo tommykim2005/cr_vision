@@ -17,5 +17,8 @@ def find_window(name_contains: str):
                 "width": bounds["Width"],
                 "height": bounds["Height"]
             }
+        else:
+            return print("Could not find")
+        
 
     return None
