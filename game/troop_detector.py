@@ -1,27 +1,34 @@
 from ultralytics import YOLO
 
+
 class TroopDetector:
-    def __init__(self, model_path, img_size= 640, conf_threshhold=0.5):
-        self.model = YOLO("models/best.pt")
+    def __init__(self, model_path, img_size=640, conf_threshold=0.5):
+        self.model = YOLO(model_path)
         self.img_size = img_size
-        self.conf_threshhold = conf_threshhold
+        self.conf_threshold = conf_threshold
+        self._last_results = None
 
     def detect(self, frame):
-        # returns a list of detections
-        results = self.model(frame, imgsz=self.img_size, verbose=False)
+        """Returns a list of detections."""
+        self._last_results = self.model(frame, imgsz=self.img_size, verbose=False)
 
         detections = []
-        for box in results[0].boxes:
+        for box in self._last_results[0].boxes:
             conf = float(box.conf)
-            if conf >= self.conf_threshhold:
+            if conf >= self.conf_threshold:
                 detections.append({
                     "class": self.model.names[int(box.cls)],
                     "conf": conf,
-                    "bbox": box.xyxy[0].toList()
+                    "bbox": box.xyxy[0].tolist()  
                 })
 
-            return detections
+        return detections  
+    def get_annotated_frame(self, frame=None):
+        """Returns frame with YOLO annotations drawn."""
+        if frame is not None:
+            self._last_results = self.model(frame, imgsz=self.img_size, verbose=False)
         
-    def get_annotated_frame(self, frame):
-        results = self.model(frame, imgsz = self.img_size, verbose = False)
-        return results[0].plot
+        if self._last_results is None:
+            raise ValueError("No results. Run detect() first.")
+        
+        return self._last_results[0].plot()  # Fixed: added ()

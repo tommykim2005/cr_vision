@@ -2,60 +2,47 @@ import time
 
 
 class TroopTracker:
-    """
-    Smooths detections over multiple frames to confirm deployments.
-    Uses position to distinguish multiple troops of same type.
-    """
+    """Smooths detections over multiple frames to confirm deployments."""
     
-    def __init__(self, min_conf=0.9, required_frames=3, timeout=0.5):
+    def __init__(self, min_conf=0.6, required_frames=3, max_gap=2):
         self.min_conf = min_conf
         self.required_frames = required_frames
-        self.timeout = timeout
+        self.max_gap = max_gap  # Max frames a troop can be missing before reset
         self.active = {}
-    
-    def _make_key(self, troop_name, bbox, grid_size=50):
-        """Create unique key based on troop type and position."""
-        cx = (bbox[0] + bbox[2]) / 2
-        cy = (bbox[1] + bbox[3]) / 2
-        return (troop_name, int(cx // grid_size), int(cy // grid_size))
+        self.frame_count = 0
     
     def process(self, detections):
         """
         Process detections and return confirmed deployments.
-        
-        Args:
-            detections: List of {"class": str, "conf": float, "bbox": [x1,y1,x2,y2]}
-        
-        Returns:
-            List of troop names that were confirmed this frame
         """
         deployments = []
-        now = time.time()
+        self.frame_count += 1
+        seen_this_frame = set()
         
         for det in detections:
             if det["conf"] < self.min_conf:
                 continue
             
-            key = self._make_key(det["class"], det["bbox"])
+            troop_name = det["class"]
+            seen_this_frame.add(troop_name)
             
-            if key not in self.active:
-                self.active[key] = {"frames": 1, "last_seen": now}
+            if troop_name not in self.active:
+                self.active[troop_name] = {"frames": 1, "last_frame": self.frame_count, "confirmed": False}
             else:
-                self.active[key]["frames"] += 1
-                self.active[key]["last_seen"] = now
+                self.active[troop_name]["frames"] += 1
+                self.active[troop_name]["last_frame"] = self.frame_count
                 
-                if self.active[key]["frames"] == self.required_frames:
-                    deployments.append(det["class"])
+                if self.active[troop_name]["frames"] >= self.required_frames and not self.active[troop_name]["confirmed"]:
+                    self.active[troop_name]["confirmed"] = True
+                    deployments.append(troop_name)
         
-        # Cleanup: remove confirmed or timed-out entries
+        # Cleanup: remove if not seen for max_gap frames
         to_remove = []
-        for key, data in self.active.items():
-            if key[0] in deployments and data["frames"] >= self.required_frames:
-                to_remove.append(key)
-            elif now - data["last_seen"] > self.timeout:
-                to_remove.append(key)
+        for name, data in self.active.items():
+            if self.frame_count - data["last_frame"] > self.max_gap:
+                to_remove.append(name)
         
-        for key in to_remove:
-            del self.active[key]
+        for name in to_remove:
+            del self.active[name]
         
         return deployments

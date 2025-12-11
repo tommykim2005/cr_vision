@@ -18,7 +18,7 @@ class EnemyTracker:
     
     def start_match(self):
         """Reset tracker for new match."""
-        self.elixir = 5.0
+        self.elixir = 7.0
         self.last_update = time.time()
         self.card_history = []
         self.deck = []
