@@ -1,7 +1,5 @@
-python 3.12
-
-opencv
-
-numpy
-
 ultralytics
+opencv-python
+mss
+numpy
+pyobjc-framework-Quartz
