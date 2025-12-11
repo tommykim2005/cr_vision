@@ -20,4 +20,4 @@ env/
 
 # Project specific
 models/*.pt
-images/
+images/.vscode/
