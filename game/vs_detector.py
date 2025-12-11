@@ -3,7 +3,7 @@ import numpy as np
 
 
 class VSDetector:
-    """Detects VS screen using template matching with multi-scale support."""
+    #DETECTS VS TEMPLATE
     
     def __init__(self, template_path, threshold=0.75):
         self.template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)

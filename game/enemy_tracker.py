@@ -1,39 +1,35 @@
 import time
 from .troop_costs import TROOP_COSTS
 
-
+"""Tracks enemy elixir and card cycle."""
 class EnemyTracker:
-    """Tracks enemy elixir and card cycle."""
-    
-    def __init__(self, start_elixir=5):
+    # Initial constructor -> elixer, max_elixer, fps, regen_per_frame, card_history, deck, cycle
+    def __init__(self, start_elixir=5, fps=10):
         self.elixir = start_elixir
         self.max_elixir = 10.0
-        self.regen_rate = 1 / 2.8  # Elixir per second
-        self.last_update = None
+        self.fps = fps  # Estimated frames per second
+        self.regen_per_frame = 1 / (2.8 * fps)  # Elixir per frame
         
         # Cycle tracking
         self.card_history = []
-        self.deck = []   # All unique cards seen (max 8)
-        self.cycle = []  # Last 4 cards played
+        self.deck = []
+        self.cycle = []
     
     def start_match(self):
         """Reset tracker for new match."""
-        self.elixir = 7.0
-        self.last_update = time.time()
+        self.elixir = 5.0
         self.card_history = []
         self.deck = []
         self.cycle = []
     
     def update(self):
         """Call every frame to regenerate elixir."""
-        if self.last_update is None:
-            self.last_update = time.time()
-            return
-        
-        now = time.time()
-        delta = now - self.last_update
-        self.elixir = min(self.max_elixir, self.elixir + delta * self.regen_rate)
-        self.last_update = now
+        self.elixir = min(self.max_elixir, self.elixir + self.regen_per_frame)
+    
+    def set_fps(self, fps):
+        """Update FPS if you measure it."""
+        self.fps = fps
+        self.regen_per_frame = 1 / (2.8 * fps)
     
     def register_card(self, card_name):
         """Register an enemy card deployment."""
@@ -42,15 +38,12 @@ class EnemyTracker:
         
         self.card_history.append({
             "card": card_name,
-            "time": time.time(),
             "cost": cost
         })
         
-        # Update deck (max 8 cards)
         if card_name not in self.deck:
             self.deck.append(card_name)
         
-        # Update cycle (last 4 played)
         if card_name in self.cycle:
             self.cycle.remove(card_name)
         self.cycle.append(card_name)
@@ -58,7 +51,6 @@ class EnemyTracker:
             self.cycle.pop(0)
     
     def get_status(self):
-        """Get current enemy status."""
         return {
             "elixir": round(self.elixir, 1),
             "deck": self.deck,
@@ -67,10 +59,6 @@ class EnemyTracker:
         }
     
     def get_hand_prediction(self):
-        """Predict what cards are currently in enemy hand."""
         if len(self.deck) < 5:
             return None
-        
-        # Cards not in current cycle are in hand
-        in_hand = [c for c in self.deck if c not in self.cycle]
-        return in_hand
+        return [c for c in self.deck if c not in self.cycle]

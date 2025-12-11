@@ -29,23 +29,16 @@ class GameStateMachine:
                 return "match_found"
         
         elif self.state == GameState.VS_SCREEN:
-            # VS screen disappears when match starts
             if not detectors["vs"].detect(frame):
                 self.state = GameState.PLAYING
                 return "game_started"
         
         elif self.state == GameState.PLAYING:
-            # Add end screen detection here when ready
-            # if detectors["end_screen"].detect(frame):
-            #     self.state = GameState.MATCH_ENDED
-            #     return "match_ended"
+            # END SCREEN DETECTORS
             pass
         
         elif self.state == GameState.MATCH_ENDED:
-            # Add lobby detection to reset
-            # if detectors["lobby"].detect(frame):
-            #     self.state = GameState.WAITING_FOR_MATCH
-            #     return "back_to_lobby"
+            # LOBBY DETECTION
             pass
         
         return None

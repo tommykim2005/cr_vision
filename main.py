@@ -21,7 +21,7 @@ def main():
     capture = ScreenCapture(monitor)
     detector = TroopDetector("models/best.pt")
     tracker = TroopTracker(min_conf=0.6, required_frames=3, max_gap=3)
-    enemy = EnemyTracker(start_elixir=5)
+    enemy = EnemyTracker(start_elixir=5, fps=10)
     vs_detector = VSDetector("images/vs_icon.png", threshold=0.75)
     state_machine = GameStateMachine()
     
