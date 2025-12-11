@@ -4,8 +4,8 @@ import cv2
 from ultralytics import YOLO
 import time
 
-from main.vs_detector import VSDetector
-from main.window_detector import find_window
+from detect.vs_detector import VSDetector
+from detect.window_detector import find_window
 from game.game_loop import start_model
 
 
@@ -16,12 +16,12 @@ model = YOLO("models/best.pt")
 def init_program():
 
     # VS detector
-    game_detector = VSDetector("images/vs_icon.png", threshold=0.85)
+    game_detector = VSDetector("images/vs_icon.png", threshold=0.5)
     vs_triggered = False
 
     sct = mss.mss()
 
-    monitor = find_window("BlueStacks")
+    monitor = find_window("BlueStacks Air")
     print(monitor)
 
     print("Waiting for VS screen...")

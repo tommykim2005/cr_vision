@@ -10,7 +10,7 @@ def start_model(sct, monitor):
     print("Starting YOLO model stream...")
     
     # Initialize trackers
-    elixer = ElixerSimulator(start_elixer=5)
+    elixer = ElixerSimulator(start_elixer=6)
     tracker = TroopTracker(min_conf=0.9, required_frames=5, timeout=0.5)
     
     while True:
@@ -21,7 +21,7 @@ def start_model(sct, monitor):
         elixer.update()
 
         # Run YOLO
-        results = model(frame, imgsz=640)
+        results = model(frame, imgsz=640, verbose=False)
         
         # Convert YOLO results to detection format
         detections = []

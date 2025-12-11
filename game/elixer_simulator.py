@@ -1,7 +1,7 @@
 import time
 
 class ElixerSimulator:
-    def __init__(self, start_elixer = 7):
+    def __init__(self, start_elixer = 6):
         self.elixer = start_elixer
         self.last_update = time.time() # starts timer at 0
         self.regen_rate = 1 / 2.8 # elixers per second

@@ -1,4 +1,4 @@
-from main.model import init_program
+from detect.init_model import init_program
 
 
 def main():
