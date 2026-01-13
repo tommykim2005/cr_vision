@@ -1,0 +1,52 @@
+from enum import Enum, auto
+
+
+class GameState(Enum):
+    WAITING_FOR_MATCH = auto()
+    VS_SCREEN = auto()
+    PLAYING = auto()
+    MATCH_ENDED = auto()
+
+
+class GameStateMachine:    
+    def __init__(self):
+        self.state = GameState.WAITING_FOR_MATCH
+    
+    def update(self, frame, detectors):
+        """
+        Update state based on current frame.
+        
+        Args:
+            frame: Current BGR frame
+            detectors: Dict with "vs" detector (add more as needed)
+        
+        Returns:
+            Event string if state changed, None otherwise
+        """
+        if self.state == GameState.WAITING_FOR_MATCH:
+            if detectors["vs"].detect(frame):
+                self.state = GameState.VS_SCREEN
+                return "match_found"
+        
+        elif self.state == GameState.VS_SCREEN:
+            if not detectors["vs"].detect(frame):
+                self.state = GameState.PLAYING
+                return "game_started"
+        
+        elif self.state == GameState.PLAYING:
+            # END SCREEN DETECTORS
+            pass
+        
+        elif self.state == GameState.MATCH_ENDED:
+            # LOBBY DETECTION
+            pass
+        
+        return None
+    
+    def reset(self):
+        """Reset to waiting state."""
+        self.state = GameState.WAITING_FOR_MATCH
+    
+    def is_playing(self):
+        """Check if currently in a match."""
+        return self.state == GameState.PLAYING
