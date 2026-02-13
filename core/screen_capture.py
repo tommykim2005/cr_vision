@@ -2,7 +2,6 @@ import mss
 import numpy as np
 import cv2
 
-# Refactor commonly used functions 
 class ScreenCapture:
     def __init__(self, monitor):
         # monitor dictionary with left, top, width, height
